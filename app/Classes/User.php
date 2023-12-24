@@ -14,67 +14,73 @@ class User {
         string $username,
         string $email,
         string $password,
+        string $created_at = null,
+        string $updated_at = null,
+        string $id = null
     ) {
-        $this->setUsername($username);
-        $this->setEmail($email);
-        $this->setPassword($password);
+        $this->set_id($id);
+        $this->set_username($username);
+        $this->set_email($email);
+        $this->set_password($password);
+        $this->set_created_at($created_at);
+        $this->set_updated_at($updated_at);
     }
 
-    public function getUsername(): string {
+    public function get_username(): string {
         return $this->username;
     }
 
-    public function setUsername($username): self {
+    public function set_username(string $username): self {
         $this->username = $username;
 
         return $this;
     }
 
-    public function getEmail(): string {
+    public function get_email(): string {
         return $this->email;
     }
 
-    public function setEmail($email): self {
+    public function set_email(string $email): self {
         $this->email = $email;
 
         return $this;
     }
 
-    public function getPassword(): string {
+    public function get_password(): string {
         return $this->password;
     }
 
-    public function setPassword($password): self {
-        $this->password = password_hash($password, PASSWORD_BCRYPT);
+    public function set_password(string $password): self {
+        $this->password = $password;
 
         return $this;
     }
 
-    public function getId(): ?int {
+    public function get_id(): ?int {
         return $this->id;
     }
 
-    public function setId($id): self {
+    public function set_id(int $id): self {
         $this->id = $id;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?string {
+    public function get_created_at(): ?string {
         return $this->created_at;
     }
 
-    public function setCreatedAt($created_at): self {
+    public function set_created_at(string $created_at): self {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?string {
+    public function get_updated_at(): ?string {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt($updated_at): self {
+    public function set_updated_at(string $updated_at): self {
         $this->updated_at = $updated_at;
 
         return $this;

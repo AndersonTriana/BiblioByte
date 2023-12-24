@@ -2,7 +2,7 @@
 
 namespace App\Classes;
 
-class User {
+class Book {
     private $id;
     private $user_id;
     private $title;
@@ -27,132 +27,132 @@ class User {
         int $publication_year = 0,
         string $cover_path = ""
     ) {
-        $this->setUserId($user_id);
-        $this->setTitle($title);
-        $this->setFilePath($file_path);
-        $this->setCurrentPage($current_page);
-        $this->setLastReadDate($last_read_date);
-        $this->setAuthor($author);
-        $this->setPages($pages);
-        $this->setPublicationYear($publication_year);
-        $this->setCoverPath($cover_path);
+        $this->set_user_id($user_id);
+        $this->set_title($title);
+        $this->set_file_path($file_path);
+        $this->set_current_page($current_page);
+        $this->set_last_read_date($last_read_date);
+        $this->set_author($author);
+        $this->set_pages($pages);
+        $this->set_publication_year($publication_year);
+        $this->set_cover_path($cover_path);
     }
 
-    public function getId(): ?int {
+    public function get_id(): ?int {
         return $this->id;
     }
 
-    public function setId($id): self {
+    public function set_id($id): self {
         $this->id = $id;
 
         return $this;
     }
 
-    public function getUserId(): int {
+    public function get_user_id(): int {
         return $this->user_id;
     }
 
-    public function setUserId($user_id): self {
+    public function set_user_id($user_id): self {
         $this->user_id = $user_id;
 
         return $this;
     }
 
-    public function getTitle(): string {
+    public function get_title(): string {
         return $this->title;
     }
 
-    public function setTitle($title): self {
+    public function set_title($title): self {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getFilePath(): string {
+    public function get_file_path(): string {
         return $this->file_path;
     }
 
-    public function setFilePath($file_path): self {
+    public function set_file_path($file_path): self {
         $this->file_path = $file_path;
 
         return $this;
     }
 
-    public function getCurrentPage() {
+    public function get_current_page() {
         return $this->current_page;
     }
 
-    public function setCurrentPage($current_page): self {
+    public function set_current_page($current_page): self {
         $this->current_page = $current_page;
 
         return $this;
     }
 
-    public function getLastReadDate() {
+    public function get_last_read_date() {
         return $this->last_read_date;
     }
 
-    public function setLastReadDate($last_read_date): self {
+    public function set_last_read_date($last_read_date): self {
         $this->last_read_date = $last_read_date;
 
         return $this;
     }
 
-    public function getAuthor(): ?string {
+    public function get_author(): ?string {
         return $this->author;
     }
 
-    public function setAuthor($author): self {
+    public function set_author($author): self {
         $this->author = $author;
 
         return $this;
     }
 
-    public function getPublicationYear(): ?int {
+    public function get_publication_year(): ?int {
         return $this->publication_year;
     }
 
-    public function setPublicationYear($publication_year): self {
+    public function set_publication_year($publication_year): self {
         $this->publication_year = $publication_year;
 
         return $this;
     }
 
-    public function getCoverPath(): ?string {
+    public function get_cover_path(): ?string {
         return $this->cover_path;
     }
 
-    public function setCoverPath($cover_path): self {
+    public function set_cover_path($cover_path): self {
         $this->cover_path = $cover_path;
 
         return $this;
     }
 
-    public function getPages(): ?int {
+    public function get_pages(): ?int {
         return $this->pages;
     }
 
-    public function setPages($pages): self {
+    public function set_pages($pages): self {
         $this->pages = $pages;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?string {
+    public function get_created_at(): ?string {
         return $this->created_at;
     }
 
-    public function setCreatedAt($created_at): self {
+    public function set_created_at($created_at): self {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?string {
+    public function get_updated_at(): ?string {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt($updated_at): self {
+    public function set_updated_at($updated_at): self {
         $this->updated_at = $updated_at;
 
         return $this;

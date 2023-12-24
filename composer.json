@@ -2,20 +2,21 @@
     "name": "anderson/biblio-byte",
     "description": "Application for tracking PDF readings, enabling users to save books and record their reading progress",
     "type": "project",
-    "license": "MIT",
+    "license": "GPL-3.0",
+    "autoload": {
+        "psr-4": {
+            "Database\\": "database/",
+            "App\\": "app/",
+            "Views\\": "views/"
+        }
+    },
     "authors": [
         {
             "name": "Anderson Triana",
             "email": "andersontrianag@gmail.com"
         }
     ],
-    "autoload": {
-        "psr-4": {
-            "Database\\": "database/",
-            "App\\": "app/"
-        }
-    },
-    "require": {
-        "vlucas/phpdotenv": "^5.6"
+    "require-dev": {
+        "maximebf/debugbar": "^1.19"
     }
 }

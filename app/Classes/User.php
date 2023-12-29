@@ -16,14 +16,14 @@ class User {
         string $password,
         string $created_at = null,
         string $updated_at = null,
-        string $id = null
+        string $id = null,
     ) {
-        $this->set_id($id);
+        $id != null ?? $this->set_id($id);
         $this->set_username($username);
         $this->set_email($email);
         $this->set_password($password);
-        $this->set_created_at($created_at);
-        $this->set_updated_at($updated_at);
+        $created_at != null ?? $this->set_created_at($created_at);
+        $updated_at != null ?? $this->set_updated_at($updated_at);
     }
 
     public function get_username(): string {

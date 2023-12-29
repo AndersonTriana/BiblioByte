@@ -92,9 +92,12 @@ class UserController {
             ];
         }
 
+        $id = $user["id"];
+        $user = new User(...$user);
+
         return [
             "status" => false,
-            "user" => new User(...$user),
+            "user" => $user->set_id($id),
             "message" => "User found"
         ];
     }
@@ -133,7 +136,7 @@ class UserController {
 
         return [
             "status" => true,
-            "message" => "User removed successfully"
+            "message" => "The user was removed successfully"
         ];
     }
 
@@ -171,7 +174,10 @@ class UserController {
             return false;
         }
 
-        return new User(...$user);
+        $id = $user["id"];
+        $user = new User(...$user);
+
+        return $user->set_id($id);
     }
 
     private function check_if_user_exists_by_username(string $username) {

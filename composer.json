@@ -18,5 +18,8 @@
     ],
     "require-dev": {
         "maximebf/debugbar": "^1.19"
+    },
+    "require": {
+        "larapack/dd": "^1.1"
     }
 }

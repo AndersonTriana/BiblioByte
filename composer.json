@@ -8,7 +8,8 @@
             "Database\\": "database/",
             "App\\": "app/",
             "Views\\": "views/"
-        }
+        },
+        "files": ["app/Routes.php"]
     },
     "authors": [
         {

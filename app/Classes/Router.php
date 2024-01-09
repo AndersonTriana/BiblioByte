@@ -23,27 +23,30 @@ class Router {
             "action" => $action
         ];
     }
-
+    
     public function route(string $method, string $resource, array $params = []) {
         $slug = explode("/", $resource);
         $resource = $slug[0] == "" ? "login" : $slug[0];
         $id = $slug[1] ?? null;
-
-        foreach ($this->routes as $route) {
-            if ($route["method"] == $method && $route["route"] == $resource) {
+        
+        foreach ($this->routes as $route) {            
+            if ($route["method"] == $method && str_contains($route["route"], $resource)) {
                 $controller = "App\\Controllers\\" . $route["controller"];
                 $action = $route["action"];
-
+                
                 $controller = new $controller();
 
                 if (!method_exists($controller, $action)) {
+                    dd($controller, $action);
                     return [
                         "status" => false,
                         "message" => "The action does not exists"
                     ];
                 }
+                
+                if ($id) array_unshift($params, $id);
 
-                return call_user_func_array([$controller, $action], [$id]);
+                return call_user_func_array([$controller, $action], [...$params]);
             }
         }
 

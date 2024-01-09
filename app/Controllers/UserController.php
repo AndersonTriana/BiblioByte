@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Classes\User;
 use Database\DatabaseConnection;
 use PDO;
+use App\Controllers\AuthController;
 
 class UserController {
 
@@ -16,10 +17,12 @@ class UserController {
 
     /** Show the form for creating a new user */
     public function create() {
+        return require('../views/Auth/Register.php');
     }
 
     /** Store a newly created user in storage */
-    public function store(User $user): array {
+    public function store(string $username, string $email, string $password): array {
+        $user = new User($username, $email, $password);
 
         $username = strtolower(trim($user->get_username()));
 
@@ -72,6 +75,9 @@ class UserController {
             ];
         }
 
+        
+        $auth = new AuthController();
+        $auth->login($user->get_email(), $user->get_password());
         return [
             "status" => true,
             "message" => "The user was created successfully"
@@ -140,31 +146,7 @@ class UserController {
         ];
     }
 
-    public function validate_login(string $email, string $password) {
-        $user = $this->get_user_by_email($email);
-
-        if (!$user) {
-            return [
-                "status" => false,
-                "message" => "The email is not connected to an account"
-            ];
-        }
-
-        if (!password_verify($password, $user->get_password())) {
-            return [
-                "status" => false,
-                "message" => "Incorrect password"
-            ];
-        }
-
-        return [
-            "status" => true,
-            "user" => $user,
-            "message" => "Login successful"
-        ];
-    }
-
-    private function get_user_by_email(string $email) {
+    public function get_user_by_email(string $email) {
         $stmt = $this->connection->prepare("SELECT * FROM `users` WHERE `email` = :email");
         $stmt->execute(["email" => $email]);
 

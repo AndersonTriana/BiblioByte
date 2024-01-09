@@ -43,6 +43,12 @@ class BookController {
 
     /* Show the form for creating a new book */
     public function create() {
+        if ($_SESSION['user_id'] ?? null) {
+            return require('../views/Books/Upload.php');
+        }
+
+        header("Location: /404");
+        exit();
     }
 
     /* Store a newly created book in storage */
@@ -65,26 +71,26 @@ class BookController {
 
     /* Display a specified book */
     public function show(int $id) {
-        $stmt = $this->connection->prepare("SELECT * FROM `books` WHERE `id` = :id");
-        $stmt->execute(["id" => $id]);
+        $user_id = $_SESSION["user_id"] ?? false;
 
-        $book = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$book) {
-            return [
-                "status" => false,
-                "message" => "The book id does not exists"
-            ];
+        if (!$user_id) {
+            return require('../views/Auth/Login.php');
         }
 
-        $id = $book["id"];
-        $book = new Book(...$book);
+        $book = $this->find_by_id($id);
 
-        return [
-            "status" => true,
-            "book" => $book->set_id($id),
-            "message" => "Book found"
-        ];
+        if (!$book["status"]) {
+            header("Location: /404");
+            exit();
+        }
+
+        $book = $book["book"];
+
+        if ($book->get_user_id() != $_SESSION["user_id"]) {
+            return require('../views/Auth/Login.php');
+        }
+
+        return require("../views/Books/Book.php");
     }
 
     /* Show the form for editing the specified book */
@@ -135,6 +141,29 @@ class BookController {
         return [
             "status" => true,
             "message" => "The book was removed successfully"
+        ];
+    }
+
+    private function find_by_id(int $id) {
+        $stmt = $this->connection->prepare("SELECT * FROM `books` WHERE `id` = :id");
+        $stmt->execute(["id" => $id]);
+
+        $book = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$book) {
+            return [
+                "status" => false,
+                "message" => "The book id does not exists"
+            ];
+        }
+
+        $id = $book["id"];
+        $book = new Book(...$book);
+
+        return [
+            "status" => true,
+            "book" => $book->set_id($id),
+            "message" => "Book found"
         ];
     }
 

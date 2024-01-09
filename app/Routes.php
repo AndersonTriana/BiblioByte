@@ -9,7 +9,9 @@ function charge_routes() {
     $router->add_route("POST", "/register",  "UserController", "store");
     $router->add_route("GET",  "/login",     "AuthController", "index");
     $router->add_route("POST", "/login",     "AuthController", "login");
+    $router->add_route("GET",  "/logout",    "AuthController", "logout");
     $router->add_route("GET",  "/home",      "HomeController", "index");
+    $router->add_route("GET",  "/404",       "HomeController", "error");
     $router->add_route("GET",  "/upload",    "BookController", "create");
     $router->add_route("POST", "/upload",    "BookController", "store");
     $router->add_route("GET",  "/book/id",   "BookController", "show");

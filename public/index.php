@@ -15,7 +15,7 @@ $auth = new AuthController();
 
 charge_routes();
 
-$slug = isset($_GET["slug"]) ? $_GET["slug"] : "";
+$slug = htmlspecialchars(isset($_GET["slug"]) ? $_GET["slug"] : "");
 $method = $_SERVER["REQUEST_METHOD"];
 $router = Router::get_instance();
 

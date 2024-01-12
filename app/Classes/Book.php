@@ -20,28 +20,28 @@ class Book {
         int $user_id,
         string $title,
         string $file_path,
-        int $id = null,
-        int $current_page = 0,
-        string $last_read_date = "",
-        string $author = "",
-        int $pages = 0,
-        int $publication_year = 0,
-        string $cover_path = null,
-        string $created_at = null,
-        string $updated_at = null,
+        ?int $id = null,
+        ?int $current_page = 0,
+        ?string $last_read_date = "",
+        ?string $author = "",
+        ?int $pages = 0,
+        ?int $publication_year = 0,
+        ?string $cover_path = null,
+        ?string $created_at = null,
+        ?string $updated_at = null,
     ) {
         $this->set_user_id($user_id);
         $this->set_title($title);
         $this->set_file_path($file_path);
-        $id != null ?? $this->set_id($id);
+        $this->set_id($id);
         $this->set_current_page($current_page);
         $this->set_last_read_date($last_read_date);
         $this->set_author($author);
         $this->set_pages($pages);
         $this->set_publication_year($publication_year);
         $this->set_cover_path($cover_path);
-        $created_at != null ?? $this->set_created_at($created_at);
-        $updated_at != null ?? $this->set_updated_at($updated_at);
+        $this->set_created_at($created_at);
+        $this->set_updated_at($updated_at);
     }
 
     public function get_id(): ?int {

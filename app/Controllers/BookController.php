@@ -39,12 +39,15 @@ class BookController {
                 "books" => array_map($func, $books)
             ];
         }
+
+        header("Location: /404");
+        exit();
     }
 
     /* Show the form for creating a new book */
     public function create() {
         if ($_SESSION['user_id'] ?? null) {
-            return require('../views/Books/Upload.php');
+            return require('../views/Books/UploadBook.php');
         }
 
         header("Location: /404");
@@ -52,21 +55,31 @@ class BookController {
     }
 
     /* Store a newly created book in storage */
-    public function store(Book $book) {
-        $stmt = $this->connection->prepare(
-            "INSERT INTO `books` (`user_id`, `title`, `author`, `file_path`, `cover_path`, `pages`, `publication_year`) 
-                        VALUES (:user_id,  :title,  :author,  :file_path,  :cover_path,  :pages,  :publication_year)"
-        );
+    public function store(string $title, string $file_path, string $cover_path = null, string $author = "", int $pages = 0, int $publication_year = null) {
+        $user_id = $_SESSION["user_id"] ?? null;
 
-        $stmt->execute([
-            "user_id"    => $book->get_user_id(),
-            "title"      => $book->get_title(),
-            "author"     => $book->get_author(),
-            "file_path"  => $book->get_file_path(),
-            "cover_path" => $book->get_cover_path(),
-            "pages"      => $book->get_pages(),
-            "publication_year" => $book->get_publication_year()
-        ]);
+        if ($user_id) {
+            $stmt = $this->connection->prepare(
+                "INSERT INTO `books` (`user_id`, `title`, `author`, `file_path`, `cover_path`, `pages`, `publication_year`) 
+                            VALUES (:user_id, :title,  :author,  :file_path,  :cover_path,  :pages,  :publication_year)"
+            );
+
+            $stmt->execute([
+                "user_id"    => $user_id,
+                "title"      => $title,
+                "author"     => $author,
+                "file_path"  => $file_path,
+                "cover_path" => $cover_path,
+                "pages"      => $pages,
+                "publication_year" => $publication_year
+            ]);
+
+            header("Location: /home");
+            exit();
+        }
+
+        header("Location: /404");
+        exit();
     }
 
     /* Display a specified book */
@@ -94,32 +107,68 @@ class BookController {
     }
 
     /* Show the form for editing the specified book */
-    public function edit() {
+    public function edit(int $id = null) {
+        if (!$id) {
+            header("Location: /404");
+            exit();
+        }
+
+        $user_id = $_SESSION["user_id"] ?? false;
+
+        if (!$user_id) {
+            return require('../views/Auth/Login.php');
+        }
+
+        $book = $this->find_by_id($id);
+
+        if (!$book["status"]) {
+            header("Location: /404");
+            exit();
+        }
+
+        $book = $book["book"];
+
+        if ($book->get_user_id() != $_SESSION["user_id"]) {
+            return require('../views/Auth/Login.php');
+        }
+
+        return require("../views/Books/EditBook.php");
     }
 
     /* Update the specified book in storage */
-    public function update(Book $book) {
-        $stmt = $this->connection->prepare(
-            "UPDATE `books` 
-                SET `user_id` = :user_id, `title` = :title, `author` = :author, `file_path` = :file_path, `cover_path` = :cover_path, `pages` = :pages, `publication_year` = :publication_year
-              WHERE `id` = :id AND `user_id` = :user_id"
-        );
+    public function update(int $id, string $title, string $file_path, string $cover_path = null, string $author = "", int $pages = 0, int $publication_year = null) {
+        $user_id = $_SESSION["user_id"] ?? null;
 
-        $stmt->execute([
-            "id"         => $book->get_id(),
-            "user_id"    => $book->get_user_id(),
-            "title"      => $book->get_title(),
-            "author"     => $book->get_author(),
-            "file_path"  => $book->get_file_path(),
-            "cover_path" => $book->get_cover_path(),
-            "pages"      => $book->get_pages(),
-            "publication_year" => $book->get_publication_year()
-        ]);
+        if ($user_id) {
+            $stmt = $this->connection->prepare(
+                "UPDATE `books` 
+                    SET `user_id` = :user_id, `title` = :title, `author` = :author, `file_path` = :file_path, `cover_path` = :cover_path, `pages` = :pages, `publication_year` = :publication_year
+                WHERE `id` = :id AND `user_id` = :user_id"
+            );
 
-        return [
-            "status" => true,
-            "message" => "The book was updated successfully"
-        ];
+            $stmt->execute([
+                "id"         => $id,
+                "user_id"    => $user_id,
+                "title"      => $title,
+                "author"     => $author,
+                "file_path"  => $file_path,
+                "cover_path" => $cover_path,
+                "pages"      => $pages,
+                "publication_year" => $publication_year
+            ]);
+
+            header("Location: /book/$id");
+            exit();
+            /* 
+            return [
+                "status" => true,
+                "message" => "The book was updated successfully"
+            ]; 
+            */
+        }
+
+        header("Location: /404");
+        exit();
     }
 
     /* Remove the specified book from storage */

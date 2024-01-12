@@ -11,14 +11,14 @@
     <h2>Upload Book</h2>
 
     <form action="/upload" method="post">
-        <label for="book">Book</label>
-        <input name="book" type="file" accept=".pdf" required>
-
-        <label for="cover">Cover</label>
-        <input name="cover" type="file" accept=".png,.jpg">
-
         <label for="title">Title</label>
         <input name="title" type="title" required>
+
+        <label for="file_path">Book</label>
+        <input name="file_path" type="file" accept=".pdf" required>
+
+        <label for="cover_path">Cover</label>
+        <input name="cover_path" type="file" accept=".png,.jpg">
 
         <label for="author">Author</label>
         <input name="author" type="author">

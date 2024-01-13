@@ -40,7 +40,7 @@ class BookController {
             ];
         }
 
-        header("Location: /404");
+        header("Location: /login");
         exit();
     }
 

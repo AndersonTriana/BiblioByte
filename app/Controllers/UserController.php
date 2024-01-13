@@ -17,7 +17,13 @@ class UserController {
 
     /** Show the form for creating a new user */
     public function create() {
-        return require('../views/Auth/Register.php');
+        $user_id = $_SESSION["user_id"] ?? false;
+        if (!$user_id) {
+            return require('../views/Auth/Register.php');
+        }
+
+        header("Location: /home");
+        exit();
     }
 
     /** Store a newly created user in storage */
@@ -75,7 +81,7 @@ class UserController {
             ];
         }
 
-        
+
         $auth = new AuthController();
         $auth->login($user->get_email(), $user->get_password());
         return [

@@ -8,6 +8,8 @@
 </head>
 
 <body>
+    <?php require "../views/Components/Nav.php" ?>
+
     <form action="/register" method="post">
         <label for="username">Username</label>
         <input name="username" type="text">

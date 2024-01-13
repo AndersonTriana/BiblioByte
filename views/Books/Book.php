@@ -8,6 +8,8 @@
 </head>
 
 <body>
+    <?php require "../views/Components/Nav.php" ?>
+
     <img src="<?= $book->get_file_path(); ?>" alt="Cover <?= $book->get_title(); ?>" sizes="40,40">
 
     <h2><?= $book->get_title(); ?></h2>

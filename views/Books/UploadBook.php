@@ -8,6 +8,8 @@
 </head>
 
 <body>
+    <?php require "../views/Components/Nav.php" ?>
+
     <h2>Upload Book</h2>
 
     <form action="/upload" method="post">

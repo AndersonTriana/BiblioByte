@@ -8,6 +8,8 @@
 </head>
 
 <body>
+    <?php require "../views/Components/Nav.php" ?>
+
     <h1>Please sign in</h1>
 
     <form action="/login" method="post">

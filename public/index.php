@@ -2,12 +2,8 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
-use App\Classes\User;
-use App\Classes\Book;
 use App\Classes\Router;
 use App\Controllers\AuthController;
-use App\Controllers\UserController;
-use App\Controllers\BookController;
 
 session_start();
 
@@ -20,6 +16,11 @@ $method = $_SERVER["REQUEST_METHOD"];
 $router = Router::get_instance();
 
 $params = $_POST ?? null;
+
+if ($_FILES) {
+    $params = array_merge($_FILES, $params);
+}
+
 $router->route($method, $slug, $params);
 
 dd($_SESSION);

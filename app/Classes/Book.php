@@ -6,11 +6,13 @@ class Book {
     private $id;
     private $user_id;
     private $title;
+    private $file_name;
     private $file_path;
     private $current_page;
     private $last_read_date;
     private $author;
     private $publication_year;
+    private $cover_name;
     private $cover_path;
     private $pages;
     private $created_at;
@@ -19,6 +21,7 @@ class Book {
     public function __construct(
         int $user_id,
         string $title,
+        string $file_name,
         string $file_path,
         ?int $id = null,
         ?int $current_page = 0,
@@ -26,12 +29,14 @@ class Book {
         ?string $author = "",
         ?int $pages = 0,
         ?int $publication_year = 0,
+        ?string $cover_name = null,
         ?string $cover_path = null,
         ?string $created_at = null,
         ?string $updated_at = null,
     ) {
         $this->set_user_id($user_id);
         $this->set_title($title);
+        $this->set_file_name($file_name);
         $this->set_file_path($file_path);
         $this->set_id($id);
         $this->set_current_page($current_page);
@@ -39,6 +44,7 @@ class Book {
         $this->set_author($author);
         $this->set_pages($pages);
         $this->set_publication_year($publication_year);
+        $this->set_cover_name($cover_name);
         $this->set_cover_path($cover_path);
         $this->set_created_at($created_at);
         $this->set_updated_at($updated_at);
@@ -70,6 +76,16 @@ class Book {
 
     public function set_title($title): self {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function get_file_name() {
+        return $this->file_name;
+    }
+
+    public function set_file_name($file_name): self {
+        $this->file_name = $file_name;
 
         return $this;
     }
@@ -120,6 +136,16 @@ class Book {
 
     public function set_publication_year($publication_year): self {
         $this->publication_year = $publication_year;
+
+        return $this;
+    }
+
+    public function get_cover_name() {
+        return $this->cover_name;
+    }
+
+    public function set_cover_name($cover_name): self {
+        $this->cover_name = $cover_name;
 
         return $this;
     }

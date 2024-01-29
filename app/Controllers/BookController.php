@@ -50,25 +50,77 @@ class BookController {
             return require('../views/Books/UploadBook.php');
         }
 
-        header("Location: /404");
-        exit();
+        $this->redirect_to_not_found();
     }
 
     /* Store a newly created book in storage */
-    public function store(string $title, string $file_path, string $cover_path = null, string $author = "", int $pages = 0, int $publication_year = null) {
+    public function store(string $title, array $book, array $cover = null, string $author = "", int $pages = 0, int $publication_year = null) {
         $user_id = $_SESSION["user_id"] ?? null;
 
         if ($user_id) {
+            $user_folder = $this->create_user_folder();
+            $cover_path = "";
+
+            // Validate and move cover file
+            if ($cover["name"]) {
+                if (!$this->is_valid_cover_file($cover["name"], $cover["size"])) {
+                    $error = [
+                        "message" => "The book cover is not valid",
+                        "input" => "cover"
+                    ];
+
+                    return require('../views/Books/UploadBook.php');
+                }
+
+                $user_covers_folder = $user_folder . "/covers";
+                $cover_file_name = $this->get_unique_file_name($user_covers_folder, $cover["name"]);
+                $cover_path = $user_covers_folder . "/" . $cover_file_name;
+
+                if (!move_uploaded_file($cover["tmp_name"], $cover_path)) {
+                    $error = [
+                        "message" => "There was an error uploading the book cover",
+                        "input" => "cover"
+                    ];
+                    return require('../views/Books/UploadBook.php');
+                }
+            }
+
+            // Validate and move book file
+            if (!$this->is_valid_book_file($book["name"], $book["size"])) {
+                $error = [
+                    "message" => "The book file is not valid",
+                    "input" => "book"
+                ];
+
+                return require('../views/Books/UploadBook.php');
+            }
+
+            $user_books_folder = $user_folder . "/books";
+            $book_file_name = $this->get_unique_file_name($user_books_folder, $book["name"]);
+            $book_path = $user_books_folder . "/" . $book_file_name;
+
+            if (!move_uploaded_file($book["tmp_name"], $book_path)) {
+                $error = [
+                    "message" => "There was an error uploading de book",
+                    "input" => "book"
+                ];
+
+                return require('../views/Books/UploadBook.php');
+            }
+
+            //Upload book to database
             $stmt = $this->connection->prepare(
-                "INSERT INTO `books` (`user_id`, `title`, `author`, `file_path`, `cover_path`, `pages`, `publication_year`) 
-                            VALUES (:user_id, :title,  :author,  :file_path,  :cover_path,  :pages,  :publication_year)"
+                "INSERT INTO `books` (`user_id`, `title`, `author`, `file_name`, `file_path`, `cover_name`, `cover_path`, `pages`, `publication_year`) 
+                            VALUES (:user_id, :title,  :author, :file_name,  :file_path, :cover_name,  :cover_path,  :pages,  :publication_year)"
             );
 
             $stmt->execute([
                 "user_id"    => $user_id,
                 "title"      => $title,
                 "author"     => $author,
-                "file_path"  => $file_path,
+                "file_name"  => $book_file_name,
+                "file_path"  => $book_path,
+                "cover_name" => $cover_file_name,
                 "cover_path" => $cover_path,
                 "pages"      => $pages,
                 "publication_year" => $publication_year
@@ -78,8 +130,7 @@ class BookController {
             exit();
         }
 
-        header("Location: /404");
-        exit();
+        $this->redirect_to_not_found();
     }
 
     /* Display a specified book */
@@ -93,8 +144,7 @@ class BookController {
         $book = $this->find_by_id($id);
 
         if (!$book["status"]) {
-            header("Location: /404");
-            exit();
+            $this->redirect_to_not_found();
         }
 
         $book = $book["book"];
@@ -103,14 +153,25 @@ class BookController {
             return require('../views/Auth/Login.php');
         }
 
+        $cover_path = $book->get_cover_path();
+        $cover_uri = null;
+
+        if ($cover_path) {   
+            if (file_exists($cover_path)) {
+                $cover_mime_type = mime_content_type($cover_path);
+                $cover_path = base64_encode(file_get_contents($cover_path));
+                
+                $cover_uri = "data:$cover_mime_type;base64,$cover_path";
+            }
+        }
+
         return require("../views/Books/Book.php");
     }
 
     /* Show the form for editing the specified book */
     public function edit(int $id = null) {
         if (!$id) {
-            header("Location: /404");
-            exit();
+            $this->redirect_to_not_found();
         }
 
         $user_id = $_SESSION["user_id"] ?? false;
@@ -122,8 +183,7 @@ class BookController {
         $book = $this->find_by_id($id);
 
         if (!$book["status"]) {
-            header("Location: /404");
-            exit();
+            $this->redirect_to_not_found();
         }
 
         $book = $book["book"];
@@ -136,13 +196,13 @@ class BookController {
     }
 
     /* Update the specified book in storage */
-    public function update(int $id, string $title, string $file_path, string $cover_path = null, string $author = "", int $pages = 0, int $publication_year = null) {
+    public function update(int $id, string $title, string $file_name, string $file_path, string $cover_name = null, string $cover_path = null, string $author = "", int $pages = 0, int $publication_year = null) {
         $user_id = $_SESSION["user_id"] ?? null;
 
         if ($user_id) {
             $stmt = $this->connection->prepare(
                 "UPDATE `books` 
-                    SET `user_id` = :user_id, `title` = :title, `author` = :author, `file_path` = :file_path, `cover_path` = :cover_path, `pages` = :pages, `publication_year` = :publication_year
+                    SET `user_id` = :user_id, `title` = :title, `author` = :author, `file_name` = :file_name, `file_path` = :file_path, `cover_name` = :cover_name, `cover_path` = :cover_path, `pages` = :pages, `publication_year` = :publication_year
                 WHERE `id` = :id AND `user_id` = :user_id"
             );
 
@@ -152,23 +212,18 @@ class BookController {
                 "title"      => $title,
                 "author"     => $author,
                 "file_path"  => $file_path,
+                "file_name"  => $file_name,
                 "cover_path" => $cover_path,
+                "cover_name" => $cover_name,
                 "pages"      => $pages,
                 "publication_year" => $publication_year
             ]);
 
             header("Location: /book/$id");
             exit();
-            /* 
-            return [
-                "status" => true,
-                "message" => "The book was updated successfully"
-            ]; 
-            */
         }
 
-        header("Location: /404");
-        exit();
+        $this->redirect_to_not_found();
     }
 
     /* Remove the specified book from storage */
@@ -227,5 +282,59 @@ class BookController {
         }
 
         return true;
+    }
+
+    private function is_valid_book_file(string $file_name, int $size): bool {
+        return $size < MAX_BOOK_FILE_SIZE && pathinfo($file_name, PATHINFO_EXTENSION) == "pdf";
+    }
+
+    private function is_valid_cover_file(string $file_name, int $size): bool {
+        return $size < MAX_COVER_FILE_SIZE && (pathinfo($file_name, PATHINFO_EXTENSION) == "jpg" || pathinfo($file_name, PATHINFO_EXTENSION) == "png");
+    }
+
+    private function create_user_folder(): string {
+        $user_folder = "../" . STORAGE_PATH . hash("md4", $_SESSION["user_id"]);
+
+        if (!is_dir($user_folder) && !file_exists($user_folder)) {
+            mkdir(
+                $user_folder,
+                0755,
+                false
+            );
+            mkdir(
+                $user_folder . "/books",
+                0755,
+                false
+            );
+            mkdir(
+                $user_folder . "/covers",
+                0755,
+                false
+            );
+        }
+
+        return $user_folder;
+    }
+
+    private function get_unique_file_name(string $folder, string $file_name): string {
+        $file_name_len = strlen($file_name);
+
+        if ($file_name_len > MAX_BOOK_NAME_LENGTH) {
+            $file_name = substr($file_name, $file_name_len - MAX_BOOK_NAME_LENGTH);
+        }
+
+        $counter = 1;
+
+        while (file_exists($folder . "/" . $file_name)) {
+            $file_name = pathinfo($file_name, PATHINFO_FILENAME) . '_' . $counter . '.' . pathinfo($file_name, PATHINFO_EXTENSION);
+            $counter++;
+        }
+
+        return $file_name;
+    }
+
+    private function redirect_to_not_found(): void {
+        header("Location: /404");
+        exit();
     }
 }

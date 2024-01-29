@@ -9,7 +9,10 @@
             "App\\": "app/",
             "Views\\": "views/"
         },
-        "files": ["app/Routes.php"]
+        "files": [
+            "app/Routes.php",
+            "app/Config.php"
+        ]
     },
     "authors": [
         {

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" href="/css/Components/nav.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" type="image/x-icon" href="../imgs/favicon.svg">
     <title><?= $book->get_title(); ?></title>
 </head>
@@ -27,10 +27,25 @@
             <div class="button-group vertical">
                 <button>Read</button>
                 <a class="button" href="<?= "/edit/{$book->get_id()}"; ?>">Edit</a>
-                <button class="accent">Delete</button>
+                <button id="delete" class="accent">Delete</button>
             </div>
         </article>
     </div>
 </body>
+
+<script>
+    const deleteButton = document.getElementById("delete");
+    deleteButton.addEventListener("click", () => {
+        if (confirm("¿Quiere eliminar este libro?")) {
+            form = document.createElement("form");
+            form.action = "/delete/<?= $book->get_id() ?>";
+            form.method = "POST";
+
+            document.body.appendChild(form);
+
+            form.submit();
+        }
+    });
+</script>
 
 </html>

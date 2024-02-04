@@ -4,33 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/Components/nav.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/x-icon" href="/imgs/favicon.svg">
     <title>Upload Book</title>
 </head>
 
 <body>
-    <?php require "../views/Components/Nav.php" ?>
+    <div class="app">
+        <?php require "../views/Components/Nav.php" ?>
 
-    <h2>Upload Book</h2>
+        <h2>Upload Book</h2>
 
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <label for="title">Title</label>
-        <input id="title" name="title" type="title" value="<?php if (isset($_POST["title"])) echo $_POST["title"];  ?>" required>
+        <div class="form">
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <label for="title">Title</label>
+                <input id="title" name="title" type="title" value="<?php if (isset($_POST["title"])) echo $_POST["title"];  ?>" required>
 
-        <label for="book">Book</label>
-        <label for="book" class="file book-file">Select the book file</label>
-        <input id="book" name="book" type="file" accept=".pdf" value="<?php if (isset($_POST["book"])) echo $_POST["book"];  ?>" required>
+                <label for="book">Book</label>
+                <label for="book" class="file book-file">Select the book file</label>
+                <input id="book" name="book" type="file" accept=".pdf" value="<?php if (isset($_POST["book"])) echo $_POST["book"];  ?>" required>
 
-        <label for="cover">Cover</label>
-        <label for="cover" class="file cover-file">Select the cover file</label>
-        <input id="cover" name="cover" type="file" accept=".png,.jpg" value="<?php if (isset($_POST["cover"])) echo $_POST["cover"];  ?>">
+                <label for="cover">Cover</label>
+                <label for="cover" class="file cover-file">Select the cover file</label>
+                <input id="cover" name="cover" type="file" accept=".png,.jpg" value="<?php if (isset($_POST["cover"])) echo $_POST["cover"];  ?>">
 
-        <label for="author">Author</label>
-        <input id="author" name="author" type="author" value="<?php if (isset($_POST["author"])) echo $_POST["author"];  ?>">
+                <label for="author">Author</label>
+                <input id="author" name="author" type="author" value="<?php if (isset($_POST["author"])) echo $_POST["author"];  ?>">
 
-        <button type="submit">Upload Book</button>
-    </form>
+                <button type="submit">Upload Book</button>
+            </form>
+        </div>
+    </div>
 </body>
 
 <script>

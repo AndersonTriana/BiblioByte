@@ -3,40 +3,86 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit - <?= $book->get_title(); ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="/css/Components/nav.css">
+    <link rel="icon" type="image/x-icon" href="/imgs/favicon.svg">
+    <title>Edit - <?= $book->get_title() ?? "Unknown"; ?></title>
 </head>
 
 <body>
-    <?php require "../views/Components/Nav.php" ?>
+    <div class="app">
+        <?php require "../views/Components/Nav.php" ?>
 
-    <img src="<?= $book->get_file_path(); ?>" alt="Cover <?= $book->get_title(); ?>" sizes="40,40">
+        <div class="edit-form">
+            <article class="book">
+                <div class="info">
+                    <img class="cover" src="<?= $cover_uri ?? "/imgs/default_cover.png"; ?>" alt="Cover <?= $book->get_title(); ?>" sizes="40,40">
 
-    <h2><?= $book->get_title(); ?></h2>
+                    <h2 class="title"><?= $book->get_title(); ?></h2>
 
-    <?php if ($book->get_author()) : ?>
-        <p><?= $book->get_author(); ?></p>
+                    <p class="author">
+                        <?= $book->get_author() != "" ? $book->get_author() : "Unknown"; ?>
+                    </p>
+                </div>
+            </article>
+
+            <div class="form">
+                <form action="/edit/<?= $book->get_id(); ?>" method="post" enctype="multipart/form-data">
+
+                    <label for="title">Title</label>
+                    <input id="title" name="title" type="title" placeholder="<?php echo $book->get_title() ?? null ?>" value="<?php if (isset($_POST["title"])) echo $_POST["title"]; ?>">
+
+                    <label for="book">Book</label>
+                    <label for="book" class="file book-file">Select the book file</label>
+                    <input id="book" name="book" type="file" accept=".pdf" value="<?php if (isset($_POST["book"])) echo $_POST["book"];  ?>">
+
+                    <label for="cover">Cover</label>
+                    <label for="cover" class="file cover-file">Select the cover file</label>
+                    <input id="cover" name="cover" type="file" accept=".png,.jpg" value="<?php if (isset($_POST["cover"])) echo $_POST["cover"];  ?>">
+
+                    <label for="author">Author</label>
+                    <input id="author" name="author" type="author" placeholder="<?php echo $book->get_author() ?? null ?>" value="<?php if (isset($_POST["author"])) echo $_POST["author"]; ?>">
+
+                    <button class="button" type="submit">Edit Book</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    // Styling form errors
+    <?php if ($error ?? null) : ?>
+        let error = <?= json_encode($error) ?? null ?>;
+
+        if (error) {
+            let input = document.getElementById(error.input);
+            input.classList.add("error");
+
+            input.previousElementSibling.classList.add("error");
+
+            error_element = document.createElement("p");
+            error_element.classList.add("error");
+            error_element.innerText = error.message;
+
+            input.insertAdjacentElement('afterend', error_element);
+        }
     <?php endif; ?>
 
-    <h2>Upload Book</h2>
+    // Show file name on inputs
+    for (let input of document.querySelectorAll("input[type='file']")) {
+        input.addEventListener("change", () => {
+            console.log(input.files[0]);
 
-    <form action="/edit" method="post">
-        <input name="id" value="<?= $book->get_id(); ?>" hidden>
+            let max_name_size = 25;
+            let file_name = input.files[0].name;
 
-        <label for="title">Title</label>
-        <input name="title" type="text" required>
+            if (file_name.length > max_name_size) {
+                file_name = file_name.slice(0, max_name_size) + "...";
+            }
 
-        <label for="file_path">Book</label>
-        <input name="file_path" type="file" accept=".pdf" required>
-
-        <label for="cover_path">Cover</label>
-        <input name="cover_path" type="file" accept=".png,.jpg">
-
-        <label for="author">Author</label>
-        <input name="author" type="text">
-
-        <button type="submit">Edit Book</button>
-    </form>
-</body>
+            input.previousElementSibling.textContent = file_name;
+        });
+    }
+</script>
 
 </html>

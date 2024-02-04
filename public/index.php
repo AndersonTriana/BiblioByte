@@ -22,5 +22,3 @@ if ($_FILES) {
 }
 
 $router->route($method, $slug, $params);
-
-dd($_SESSION);

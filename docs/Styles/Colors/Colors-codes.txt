@@ -1,0 +1,11 @@
+Your selected colors:
+
+        Text: #22262a - rgb(34, 38, 42) - hsl(210, 11%, 15%)
+        Background: #f9fbfd - rgb(249, 251, 253) - hsl(210, 50%, 98%)
+        Primary: #001061 - rgb(0, 16, 97) - hsl(230, 100%, 19%)
+        Secondary: #8b6bfd - rgb(139, 107, 253) - hsl(253, 97%, 71%)
+        Accent: #EFB823 - rgb(239, 184, 35) - hsl(44, 86%, 54%)
+
+Realtime Colors link for selected colors: https://www.realtimecolors.com/?colors=22262a-f9fbfd-001061-8798EE-EFB823&fonts=Syne-Montserrat
+
+Thanks for using RealtimeColors.com!

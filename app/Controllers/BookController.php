@@ -392,21 +392,17 @@ class BookController {
         $stmt = $this->connection->prepare("DELETE FROM `books` WHERE `id` = :id AND `user_id` = :user_id");
 
         if (!$this->check_if_book_exists_by_id($id)) {
-            return [
-                "status" => false,
-                "message" => "The book does not exists"
-            ];
+            header("Location: /home");
+            exit();
         }
-
+        
         $stmt->execute([
             "id"      => $id,
             "user_id" => $_SESSION["user_id"]
         ]);
-
-        return [
-            "status" => true,
-            "message" => "The book was removed successfully"
-        ];
+        
+        header("Location: /home");
+        exit();
     }
 
     private function find_by_id(int $id) {

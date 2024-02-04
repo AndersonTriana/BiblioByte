@@ -30,8 +30,19 @@ class BookController {
                 ];
             }
 
-            $func = function (array $books) {
-                return new Book(...$books);
+            $func = function (array $book) {
+                $cover_path = $book["cover_path"];
+
+                if ($cover_path) {
+                    if (file_exists($cover_path)) {
+                        $cover_mime_type = mime_content_type($cover_path);
+                        $cover_path = base64_encode(file_get_contents($cover_path));
+
+                        $book["cover_path"] = "data:$cover_mime_type;base64,$cover_path";
+                    }
+                }
+
+                return new Book(...$book);
             };
 
             return [
@@ -59,10 +70,21 @@ class BookController {
 
         if ($user_id) {
             $user_folder = $this->create_user_folder();
-            $cover_path = "";
+
+            if (strlen($title) > MAX_BOOK_NAME_LENGTH) {
+                $error = [
+                    "message" => "The title is too large (Max 60)",
+                    "input" => "title"
+                ];
+
+                return require('../views/Books/UploadBook.php');
+            }
 
             // Validate and move cover file
+            $cover_path = "";
+
             if ($cover["name"]) {
+
                 if (!$this->is_valid_cover_file($cover["name"], $cover["size"])) {
                     $error = [
                         "message" => "The book cover is not valid",
@@ -138,7 +160,8 @@ class BookController {
         $user_id = $_SESSION["user_id"] ?? false;
 
         if (!$user_id) {
-            return require('../views/Auth/Login.php');
+            header("Location: /login");
+            exit();
         }
 
         $book = $this->find_by_id($id);
@@ -150,17 +173,18 @@ class BookController {
         $book = $book["book"];
 
         if ($book->get_user_id() != $_SESSION["user_id"]) {
-            return require('../views/Auth/Login.php');
+            header("Location: /login");
+            exit();
         }
 
         $cover_path = $book->get_cover_path();
         $cover_uri = null;
 
-        if ($cover_path) {   
+        if ($cover_path) {
             if (file_exists($cover_path)) {
                 $cover_mime_type = mime_content_type($cover_path);
                 $cover_path = base64_encode(file_get_contents($cover_path));
-                
+
                 $cover_uri = "data:$cover_mime_type;base64,$cover_path";
             }
         }
@@ -177,7 +201,8 @@ class BookController {
         $user_id = $_SESSION["user_id"] ?? false;
 
         if (!$user_id) {
-            return require('../views/Auth/Login.php');
+            header("Location: /login");
+            exit();
         }
 
         $book = $this->find_by_id($id);
@@ -189,35 +214,171 @@ class BookController {
         $book = $book["book"];
 
         if ($book->get_user_id() != $_SESSION["user_id"]) {
-            return require('../views/Auth/Login.php');
+            header("Location: /login");
+            exit();
+        }
+
+        $cover_path = $book->get_cover_path();
+        $cover_uri = null;
+
+        if ($cover_path) {
+            if (file_exists($cover_path)) {
+                $cover_mime_type = mime_content_type($cover_path);
+                $cover_path = base64_encode(file_get_contents($cover_path));
+
+                $cover_uri = "data:$cover_mime_type;base64,$cover_path";
+            }
         }
 
         return require("../views/Books/EditBook.php");
     }
 
     /* Update the specified book in storage */
-    public function update(int $id, string $title, string $file_name, string $file_path, string $cover_name = null, string $cover_path = null, string $author = "", int $pages = 0, int $publication_year = null) {
+    public function update(int $id, string $title, array $book, array $cover = null, string $author = "", int $pages = 0, int $publication_year = null) {
         $user_id = $_SESSION["user_id"] ?? null;
+        $new_book = $book;
 
         if ($user_id) {
-            $stmt = $this->connection->prepare(
-                "UPDATE `books` 
-                    SET `user_id` = :user_id, `title` = :title, `author` = :author, `file_name` = :file_name, `file_path` = :file_path, `cover_name` = :cover_name, `cover_path` = :cover_path, `pages` = :pages, `publication_year` = :publication_year
-                WHERE `id` = :id AND `user_id` = :user_id"
-            );
 
-            $stmt->execute([
-                "id"         => $id,
-                "user_id"    => $user_id,
-                "title"      => $title,
-                "author"     => $author,
-                "file_path"  => $file_path,
-                "file_name"  => $file_name,
-                "cover_path" => $cover_path,
-                "cover_name" => $cover_name,
-                "pages"      => $pages,
-                "publication_year" => $publication_year
-            ]);
+            $book = $this->find_by_id($id)["book"];
+
+            $user_folder = $this->create_user_folder();
+            $query = "";
+            $query_params = ["id" => $id, "user_id" => $user_id];
+
+            if ($title && $title != $book->get_title()) {
+                if (strlen($title) > MAX_BOOK_NAME_LENGTH) {
+                    $error = [
+                        "message" => "The title is too large (Max 60)",
+                        "input" => "title"
+                    ];
+
+                    return require('../views/Books/EditBook.php');
+                } else {
+                    $query .= "`title` = :title";
+                    $query_params["title"] = $title;
+                }
+            }
+
+            if ($author && $author != $book->get_author()) {
+                if (strlen($author) > MAX_AUTHOR_NAME_LENGTH) {
+                    $error = [
+                        "message" => "The author name is too large (Max 60)",
+                        "input" => "author"
+                    ];
+
+                    return require('../views/Books/EditBook.php');
+                } else {
+                    $query .= $query ? ", " : "";
+                    $query .= "`author` = :author";
+                    $query_params["author"] = $author;
+                }
+            }
+
+            // Validate and move cover file
+            if ($cover["name"]) {
+
+                if (!$this->is_valid_cover_file($cover["name"], $cover["size"])) {
+                    $error = [
+                        "message" => "The book cover is not valid",
+                        "input" => "cover"
+                    ];
+
+                    return require('../views/Books/EditBook.php');
+                }
+
+                if (!file_exists($book->get_cover_path())) {
+                    $error = [
+                        "message" => "There was an error uploading the book cover",
+                        "input" => "cover"
+                    ];
+
+                    return require('../../views/Books/EditBook.php');
+                }
+
+                unlink($book->get_cover_path());
+
+                $user_covers_folder = $user_folder . "/covers";
+                $cover_file_name = $this->get_unique_file_name($user_covers_folder, $cover["name"]);
+                $cover_path = $user_covers_folder . "/" . $cover_file_name;
+
+                if (!move_uploaded_file($cover["tmp_name"], $cover_path)) {
+                    $error = [
+                        "message" => "There was an error uploading the book cover",
+                        "input" => "cover"
+                    ];
+
+                    return require('../views/Books/EditBook.php');
+                }
+
+                $query .= $query ? ", " : "";
+                $query .= "`cover_name` = :cover_name, `cover_path` = :cover_path";
+                $query_params["cover_name"] = $cover_file_name;
+                $query_params["cover_path"] = $cover_path;;
+            }
+
+            if ($new_book["name"]) {
+                // Validate and move book file
+                if (!$this->is_valid_book_file($new_book["name"], $new_book["size"])) {
+                    $error = [
+                        "message" => "The book file is not valid",
+                        "input" => "book"
+                    ];
+
+                    return require('../views/Books/EditBook.php');
+                }
+
+                if (!file_exists($book->get_file_path())) {
+                    $error = [
+                        "message" => "There was an error uploading the book file",
+                        "input" => "book"
+                    ];
+
+                    return require('../views/Books/EditBook.php');
+                }
+
+                unlink($book->get_file_path());
+
+                $user_books_folder = $user_folder . "/books";
+                $book_file_name = $this->get_unique_file_name($user_books_folder, $new_book["name"]);
+                $book_path = $user_books_folder . "/" . $book_file_name;
+
+                if (!move_uploaded_file($new_book["tmp_name"], $book_path)) {
+                    $error = [
+                        "message" => "There was an error uploading de book",
+                        "input" => "book"
+                    ];
+
+                    return require('../views/Books/EditBook.php');
+                }
+
+                $query .= $query ? ", " : "";
+                $query .= "`file_name` = :file_name, `file_path` = :file_path";
+                $query_params["file_name"] = $book_file_name;
+                $query_params["file_path"] = $book_path;
+            }
+
+            if ($pages) {
+                $query .= $query ? ", " : "";
+                $query .= "`pages` = :pages";
+                $query_params["pages"] = $pages;
+            }
+
+            if ($publication_year) {
+                $query .= $query ? ", " : "";
+                $query .= "`publication_year` = :publication_year";
+                $query_params["publication_year"] = $publication_year;
+            }
+
+            if (!$query) {
+                header("Location: " . $_SERVER["REQUEST_URI"]);
+                exit();
+            }
+
+            $query = "UPDATE `books` SET " . $query . " WHERE `id` = :id AND `user_id` = :user_id";
+
+            $stmt = $this->connection->prepare($query);
+            $stmt->execute($query_params);
 
             header("Location: /book/$id");
             exit();

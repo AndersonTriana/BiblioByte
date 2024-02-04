@@ -21,17 +21,21 @@ class AuthController {
         $user = $userController->get_user_by_email($email);
 
         if (!$user) {
-            return [
-                "status" => false,
-                "message" => "The email is not connected to an account"
+            $error = [
+                "message" => "The email is not connected to an account",
+                "input" => "email"
             ];
+
+            return require('../views/Auth/Login.php');
         }
 
         if (!password_verify($password, $user->get_password())) {
-            return [
-                "status" => false,
-                "message" => "Incorrect password"
+            $error = [
+                "message" => "Incorrect password",
+                "input" => "password"
             ];
+
+            return require('../views/Auth/Login.php');
         }
 
         $_SESSION["user_id"] = $user->get_id();

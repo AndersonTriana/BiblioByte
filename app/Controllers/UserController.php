@@ -33,33 +33,39 @@ class UserController {
         $username = strtolower(trim($user->get_username()));
 
         if (preg_match("/[^a-zA-Z0-9]/", $username)) {
-            return [
-                "status" => false,
-                "message" => "The username can't contain special characters"
+
+            $error = [
+                "message" => "The username can't contain special characters",
+                "input" => "username"
             ];
+
+            return require('../views/Auth/Register.php');
         } else if (strlen($username) > 16) {
-            return [
-                "status" => false,
-                "message" => "The username can't have more than 16 characters"
+            $error = [
+                "message" => "The username can't have more than 16 characters",
+                "input" => "username"
             ];
+
+            return require('../views/Auth/Register.php');
         }
 
         $email = strtolower(trim($user->get_email()));
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return [
-                "status" => false,
-                "message" => "The email address is not valid"
+            $error = [
+                "message" => "The email address is not valid",
+                "input" => "email"
             ];
+
+            return require('../views/Auth/Register.php');
         }
 
         $user_exists = $this->check_if_user_exists($user);
 
         if ($user_exists["status"]) {
-            return [
-                "status" => false,
-                "message" => $user_exists["message"]
-            ];
+            $error = $user_exists;
+
+            return require('../views/Auth/Register.php');
         }
 
         // Store user
@@ -75,19 +81,15 @@ class UserController {
         ]);
 
         if (!$response) {
-            return [
-                "status" => false,
-                "message" => "There was an error creating the user"
+            $error = [
+                "message" => "There was an error creating the user",
             ];
+
+            return require('../views/Error/404.php');
         }
 
-
         $auth = new AuthController();
-        $auth->login($user->get_email(), $user->get_password());
-        return [
-            "status" => true,
-            "message" => "The user was created successfully"
-        ];
+        return $auth->login($user->get_email(), $user->get_password());
     }
 
     /** Display a specified user */
@@ -197,14 +199,16 @@ class UserController {
         if ($this->check_if_user_exists_by_email($user->get_email())) {
             return [
                 "status" => true,
-                "message" => "The email alredy exists"
+                "message" => "The email alredy exists",
+                "input" => "email"
             ];
         }
-
+        
         if ($this->check_if_user_exists_by_username($user->get_username())) {
             return [
                 "status" => true,
-                "message" => "The username alredy exists"
+                "message" => "The username alredy exists",
+                "input" => "username"
             ];
         }
 

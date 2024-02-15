@@ -18,4 +18,6 @@ function charge_routes() {
     $router->add_route("POST", "/delete/id", "BookController", "destroy");
     $router->add_route("GET",  "/edit/id",   "BookController", "edit");
     $router->add_route("POST", "/edit",      "BookController", "update");
+    $router->add_route("GET",  "/read/id",   "BookController", "read");
+    $router->add_route("GET",  "/getbook/id","BookController", "book");
 }

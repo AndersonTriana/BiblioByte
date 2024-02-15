@@ -25,18 +25,32 @@
             </div>
 
             <div class="button-group vertical">
-                <button>Read</button>
-                <a class="button" href="<?= "/edit/{$book->get_id()}"; ?>">Edit</a>
+                <a id="read" class="button" href="/read/<?= $book->get_id() ?>">Read</a>
+                <a class="button" href="<?= "/edit/{$book->get_id()}" ?>">Edit</a>
                 <button id="delete" class="accent">Delete</button>
             </div>
         </article>
     </div>
+
 </body>
 
 <script>
     const deleteButton = document.getElementById("delete");
     deleteButton.addEventListener("click", () => {
-        if (confirm("¿Quiere eliminar este libro?")) {
+        if (confirm("¿Are you sure to delete?")) {
+            form = document.createElement("form");
+            form.action = "/delete/<?= $book->get_id() ?>";
+            form.method = "POST";
+
+            document.body.appendChild(form);
+
+            form.submit();
+        }
+    });
+
+    const readButton = document.getElementById("read");
+    deleteButton.addEventListener("click", () => {
+        if (confirm("¿Are you sure to delete?")) {
             form = document.createElement("form");
             form.action = "/delete/<?= $book->get_id() ?>";
             form.method = "POST";

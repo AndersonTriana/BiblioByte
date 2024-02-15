@@ -81,7 +81,8 @@ class BookController {
             }
 
             // Validate and move cover file
-            $cover_path = "";
+            $cover_path = null;
+            $cover_file_name = null;
 
             if ($cover["name"]) {
 
@@ -395,14 +396,59 @@ class BookController {
             header("Location: /home");
             exit();
         }
-        
+
         $stmt->execute([
             "id"      => $id,
             "user_id" => $_SESSION["user_id"]
         ]);
-        
+
         header("Location: /home");
         exit();
+    }
+
+    public function read($id) {
+        $book = $this->find_by_id($id);
+
+        if (!$book["status"]) {
+            $this->redirect_to_not_found();
+        }
+
+        $book = $book["book"];
+
+        if ($book->get_user_id() != $_SESSION["user_id"]) {
+            header("Location: /login");
+            exit();
+        }
+
+        return require('../views/Books/ReadBook.php');
+    }
+
+    public function book($id) {
+        $book = $this->find_by_id($id);
+
+        if (!$book["status"]) {
+            $this->redirect_to_not_found();
+        }
+
+        $book = $book["book"];
+
+        if ($book->get_user_id() != $_SESSION["user_id"]) {
+            header("Location: /login");
+            exit();
+        }
+
+
+        $file = $book->get_file_path();
+        
+        if (file_exists($file)) {
+
+            header('Content-Type: application/pdf');
+            // Se llamará downloaded.pdf
+            header('Content-Disposition: ; filename=' . basename($file));
+            // La fuente de PDF se encuentra en original.pdf
+            readfile($file);
+            exit();
+        }
     }
 
     private function find_by_id(int $id) {

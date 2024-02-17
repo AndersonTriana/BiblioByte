@@ -247,6 +247,11 @@
                             <button id="sidebarToggle" class="toolbarButton" title="Toggle Sidebar" tabindex="11" data-l10n-id="pdfjs-toggle-sidebar-button" aria-expanded="false" aria-controls="sidebarContainer">
                                 <span data-l10n-id="pdfjs-toggle-sidebar-button-label">Toggle Sidebar</span>
                             </button>
+                            <div class="splitToolbarButton">
+                                <a class="logo" href="/home">
+                                    <img class="main-logo" src="/imgs/logo-small.svg" height="40px" alt="bibliotyte logo">
+                                </a>
+                            </div>
                             <div class="toolbarButtonSpacer"></div>
                             <button id="viewFind" class="toolbarButton" title="Find in Document" tabindex="12" data-l10n-id="pdfjs-findbar-button" aria-expanded="false" aria-controls="findbar">
                                 <span data-l10n-id="pdfjs-findbar-button-label">Find</span>
@@ -276,7 +281,7 @@
                                 <button id="editorInk" class="toolbarButton" disabled="disabled" title="Draw" role="radio" aria-checked="false" aria-controls="editorInkParamsToolbar" tabindex="33" data-l10n-id="pdfjs-editor-ink-button">
                                     <span data-l10n-id="pdfjs-editor-ink-button-label">Draw</span>
                                 </button>
-                                <button id="editorStamp" class="toolbarButton" disabled="disabled" title="Add or edit images" role="radio" aria-checked="false" aria-controls="editorStampParamsToolbar" tabindex="34" data-l10n-id="pdfjs-editor-stamp-button">
+                                <button id="editorStamp" class="toolbarButton hiddenSmallView" disabled="disabled" title="Add or edit images" role="radio" aria-checked="false" aria-controls="editorStampParamsToolbar" tabindex="34" data-l10n-id="pdfjs-editor-stamp-button">
                                     <span data-l10n-id="pdfjs-editor-stamp-button-label">Add or edit images</span>
                                 </button>
                             </div>
@@ -478,8 +483,6 @@
     <div id="printContainer"></div>
 
     <input type="file" id="fileInput" class="hidden">
-
-    <canvas id="canvas" class="canvas-container"></canvas>
 
     <script id="script" type="module">
         const initialState = {

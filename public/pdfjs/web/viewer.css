@@ -3880,3 +3880,22 @@ dialog :link{
     display:none;
   }
 }
+
+.toolbar {
+  opacity: 10%;
+  transition: 200ms;
+}
+
+.toolbar:hover {
+  opacity: 100%;
+}
+
+.logo {
+display: block;
+}
+
+.main-logo {
+  display: block;
+  margin-top: 3px;
+  height: 24px;
+}
